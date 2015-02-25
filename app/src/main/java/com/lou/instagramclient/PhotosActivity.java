@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -21,14 +22,26 @@ import java.util.ArrayList;
 public class PhotosActivity extends ActionBarActivity {
     public static final String CLIENT_ID = "6ef3dfd87ccb48328c85ff1f8a3dee6e";
     private ArrayList<InstagramPhoto> _photos;
+    private InstagramPhotosAdapter _aPhotos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photos);
 
-        _photos = new ArrayList<>();
         // Send out Instagram API request to Popular Photos
+        _photos = new ArrayList<>();
+
+        // Create the adapter linking it to the source
+        _aPhotos = new InstagramPhotosAdapter(this, _photos);
+
+        // Find the listview from the layout
+        ListView lvPhotos = (ListView) findViewById(R.id.lvPhotos);
+
+        // Attach the adapter to the listview
+        lvPhotos.setAdapter(_aPhotos);
+
+        // Fetch popular photos
         fetchPopularPhotos();
     }
 
@@ -66,6 +79,9 @@ public class PhotosActivity extends ActionBarActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                // callback
+                _aPhotos.notifyDataSetChanged();
             }
 
             // onFailure
